@@ -1,10 +1,35 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.23)
 
-# aCore - CMSIS 核心头文件库
-add_library(aCore INTERFACE)
+string(TOLOWER ${MCU_DEVICE}   MCU_DEVICE_LOWER)
+string(TOLOWER ${MCU_FAMILY}   MCU_FAMILY_LOWER)
+string(TOLOWER ${TARGET_CORE}  TARGET_CORE_LOWER)
 
-target_include_directories(aCore
-    INTERFACE
+list(LENGTH CMSIS_CORES CMSIS_CORE_COUNT)
+
+if(CMSIS_CORE_COUNT GREATER 1)
+    set(CMSIS_STARTUP startup_${MCU_DEVICE_LOWER}_${TARGET_CORE}.s)
+else()
+    set(CMSIS_STARTUP startup_${MCU_DEVICE_LOWER}.s)
+endif()
+
+add_library(aCore STATIC
+    Device/${MCU_DEVICE_DIR}/Source/gcc/${CMSIS_STARTUP}
+    Device/${MCU_DEVICE_DIR}/Source/system_${MCU_FAMILY_LOWER}xx.c
+)
+
+target_sources(aCore PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/Core/Include
-        ${CMAKE_CURRENT_SOURCE_DIR}/Device/ST/STM32H7xx/Include
+        ${CMAKE_CURRENT_SOURCE_DIR}/Device/${MCU_DEVICE_DIR}/Include
+    FILES
+        Core/Include/core_${TARGET_CORE_LOWER}.h
+        Device/${MCU_DEVICE_DIR}/Include/${MCU_DEVICE_LOWER}.h
+        Device/${MCU_DEVICE_DIR}/Include/${MCU_FAMILY_LOWER}xx.h
+        Device/${MCU_DEVICE_DIR}/Include/system_${MCU_FAMILY_LOWER}xx.h
+)
+
+
+target_compile_definitions(aCore PUBLIC
+    CORE_${TARGET_CORE}
 )
