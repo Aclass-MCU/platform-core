@@ -12,9 +12,15 @@ else()
     set(CMSIS_STARTUP startup_${MCU_DEVICE_LOWER}.s)
 endif()
 
+if(CMSIS_CORE_COUNT GREATER 1)
+    set(CMSIS_SYSTEM system_${MCU_FAMILY_LOWER}xx_dualcore_boot_cm4_cm7.c)
+else()
+    set(CMSIS_SYSTEM system_${MCU_FAMILY_LOWER}xx.c)
+endif()
+
 add_library(aCore STATIC
     Device/${MCU_DEVICE_DIR}/Source/gcc/${CMSIS_STARTUP}
-    Device/${MCU_DEVICE_DIR}/Source/system_${MCU_FAMILY_LOWER}xx.c
+    Device/${MCU_DEVICE_DIR}/Source/${CMSIS_SYSTEM}
 )
 
 target_sources(aCore PUBLIC
