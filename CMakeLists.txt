@@ -38,4 +38,5 @@ target_sources(aCore PUBLIC
 
 target_compile_definitions(aCore PUBLIC
     CORE_${TARGET_CORE}
+    USER_VECT_TAB_ADDRESS
 )
